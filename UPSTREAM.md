@@ -10,7 +10,7 @@ The initial Lee Humanities edition is based on upstream **3.24.4**, commit **83c
 - The installable Lee Humanities plugin is self-contained at `plugins/leehumanities-research/`. Its original license and attribution travel with the plugin.
 - The root marketplace lists this plugin as `leehumanities-research@leehumanities` so it can coexist with the original ARS plugin.
 - The upstream root `.claude-plugin/plugin.json` still describes the original ARS package. For local loading of this edition use `claude --plugin-dir ./plugins/leehumanities-research`, not the repository root.
-- Upstream maintenance workflows are retained but their jobs run only in the upstream repository. The fork has its own Ubuntu/Windows packaging and regression workflow, `.github/workflows/leehumanities.yml`.
+- Upstream maintenance workflows are retained unchanged and were not activated for this fork. An optional Ubuntu/Windows packaging and regression workflow example is provided in `tools/leehumanities/github-actions.example.yml`; it is not active GitHub CI in this release.
 - The fork does not inherit claims about upstream evaluation results. Local schema checks, software tests, actual plugin loading and model behavior are reported separately.
 
 ## Updating deliberately

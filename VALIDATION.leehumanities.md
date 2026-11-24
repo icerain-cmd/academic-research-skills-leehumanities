@@ -21,8 +21,10 @@ Windows Claude Code **2.1.288** and Python **3.12** were identified on the targe
 - Local research-audit suite: 30 tests completed, 26 passed and 4 skipped for unavailable symbolic-link/FIFO capabilities. The two portable reparse-directory regression tests passed.
 - A separate Windows smoke test created two real NTFS junctions: one to an external fixture directory and one back to the corpus root. Both were pruned before descent; the scan terminated with only the intended local file indexed and no read errors. A junction supplied as the source root was also rejected.
 - Native `claude plugin validate --strict --json` accepted the standalone plugin and marketplace, with no errors or warnings.
+- Claude's startup inventory from the local-plugin smoke attempt registered all four namespaced agents, all nine command entries and the `humanities-research` skill. This confirms component discovery, not execution by a model.
 - A live review was attempted on two synthetic Markdown fixtures with the argument critic and source verifier requested. Claude returned `Failed to authenticate: OAuth session expired and could not be refreshed` before any role call. `claude auth status` subsequently reported `loggedIn: false`. Therefore live model dispatch and review quality are **not verified**. Sign in with `claude auth login` and repeat the review to test them.
-- Publication and installation inventory verification will be recorded after the published package is installed.
+- The package was published to `icerain-cmd/academic-research-skills-leehumanities` and installed from that GitHub source with `tools/leehumanities/install.py` at user scope. The installed plugin ID is `leehumanities-research@leehumanities`, version `1.0.0`; the installer verified `enabled: true` and no load errors.
+- `claude plugin details leehumanities-research@leehumanities` listed four agents and ten skill entries (the nine command files plus the primary skill), with zero hooks, MCP servers or LSP servers. The installed plugin code corresponds to commit `1f1cd4754cd818167de1849074b2a2c5f98ba77b`; subsequent release-preparation changes are documentation only.
 
 ## Limits
 
