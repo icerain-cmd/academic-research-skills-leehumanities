@@ -39,7 +39,14 @@ A second bounded run dispatched the source verifier once. It completed in 36.2 s
 - `jj-academic-korea.kci_search_articles` actually searched the public topic `사이버문학`; the response reported 17 total records and returned 10. This was bibliography retrieval, not original-paper verification. Some abstract fields were `[object Object]`; that formatting defect remains in the existing MCP service, and the plugin now explicitly treats such placeholders as unreadable text rather than accessed abstracts.
 - The verifier's `WebFetch` call to Semantic Scholar's official Graph REST URL successfully retrieved the public test paper's title, year and source URL. It preserved the earlier MCP failure and did not claim full-text access.
 
-The direct MCP permission defect is corrected in the candidate. Final published-package installation verification will be recorded after the update.
+### Published-package installation
+
+- Published plugin code commit: `c1e6e1798ea7006494abebe1cc6520e2ee379e30`.
+- Updated the existing GitHub marketplace and installed `leehumanities-research@leehumanities` **1.0.1** at user scope through the bundled installer. Claude reported `enabled: true` and no load errors.
+- Compared all **31 tracked installed plugin source files** against the published checkout after normalizing CRLF to LF: every file matched. Runtime/cache marker files were outside this source comparison.
+- The other **five installed plugin entries** retained their versions, scopes, enabled states and project associations.
+- Native plugin inventory showed four agents and ten skill entries (nine commands plus the main skill), with no plugin-owned hooks or MCP/LSP servers.
+- This fixes the plugin's direct-MCP tool permission defect. It does not repair the remote Semantic Scholar service or the existing Korean MCP's abstract formatting. Existing Claude sessions may need plugin reload or a fresh session; a fresh session also retries initial MCP connections without changing the server allowlist.
 
 ## 1.0.0 baseline
 
