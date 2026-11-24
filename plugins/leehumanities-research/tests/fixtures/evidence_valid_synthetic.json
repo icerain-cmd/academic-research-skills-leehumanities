@@ -1,0 +1,36 @@
+{
+  "schema_version": "leehumanities-evidence/1.0",
+  "fixture_notice": "SYNTHETIC TEST ONLY. This record does not describe an actual publication or actual verification.",
+  "sources": [
+    {
+      "source_id": "S1",
+      "title": "Synthetic archival note on a reading discussion",
+      "source_type": "primary_archival",
+      "uri": "https://example.org/synthetic/reading-note",
+      "existence": "CONFIRMED",
+      "existence_basis": "Synthetic fixture declaration, not a live source lookup",
+      "access_scope": "full_text",
+      "read_scope": "Entire two-paragraph synthetic note",
+      "accessed_at": "2026-11-24",
+      "read_by": "fixture-only:test-author"
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "C1",
+      "text": "The synthetic note records a question asked during a reading discussion.",
+      "evidence": [
+        {
+          "source_id": "S1",
+          "status": "VERIFIED",
+          "support": "SUPPORTED",
+          "verification_scope": "full_text",
+          "locator": {"kind": "paragraph", "value": "2"},
+          "excerpt": "During the reading discussion, one participant asked what the term meant.",
+          "assessor": "fixture-only:test-author",
+          "assessment_note": "The synthetic excerpt records a question; no claim is made about its answer."
+        }
+      ]
+    }
+  ]
+}

@@ -1,24 +1,17 @@
 {
-  "name": "academic-research-skills",
+  "name": "leehumanities",
   "owner": {
-    "name": "Cheng-I Wu",
-    "url": "https://github.com/Imbad0202"
+    "name": "Lee Humanities",
+    "url": "https://github.com/icerain-cmd"
   },
-  "description": "Academic Research Skills — contract-audited research, writing, peer review, and pipeline orchestration for Claude Code.",
+  "description": "한국어 인문학 연구를 위한 ARS 포크: 개념 계보, 원전 검증, 논증 비판, 저자 문체와 수정 이력.",
   "plugins": [
     {
-      "name": "academic-research-skills",
-      "source": "./",
-      "description": "5 skills + 35 modes + Material Passport pipeline. Includes v3.6.7 cross-model audit gate and v3.6.8 generator-evaluator contract.",
-      "version": "3.24.4",
-      "license": "CC-BY-NC-4.0",
-      "skills": [
-        "./academic-paper",
-        "./academic-paper-reviewer",
-        "./academic-pipeline",
-        "./deep-research",
-        "./sr-screener"
-      ]
+      "name": "leehumanities-research",
+      "source": "./plugins/leehumanities-research",
+      "version": "1.0.0",
+      "description": "인문학 연구·집필·검증 플러그인. 4개 명시적 역할, 9개 명령, 로컬 출처 기록 및 수정 비교.",
+      "license": "CC-BY-NC-4.0"
     }
   ]
 }

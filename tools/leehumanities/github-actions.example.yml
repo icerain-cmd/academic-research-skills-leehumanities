@@ -1,0 +1,38 @@
+name: LeeHumanities plugin
+
+on:
+  push:
+    paths:
+      - '.claude-plugin/marketplace.json'
+      - 'plugins/leehumanities-research/**'
+      - 'tools/leehumanities/**'
+      - '.github/workflows/leehumanities.yml'
+  pull_request:
+    paths:
+      - '.claude-plugin/marketplace.json'
+      - 'plugins/leehumanities-research/**'
+      - 'tools/leehumanities/**'
+      - '.github/workflows/leehumanities.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  local-contracts:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate self-contained plugin
+        run: python tools/leehumanities/validate_package.py
+      - name: Test installer and package safety
+        run: python -m unittest discover -s tools/leehumanities -p 'test_*.py' -v
+      - name: Test local research audit tools
+        run: python -m unittest discover -s plugins/leehumanities-research/tests -p 'test_*.py' -v

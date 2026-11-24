@@ -1,0 +1,35 @@
+{
+  "schema_version": "leehumanities-evidence/1.0",
+  "fixture_notice": "SYNTHETIC INVALID TEST ONLY. The declared reading scope is deliberately overstated.",
+  "sources": [
+    {
+      "source_id": "S1",
+      "title": "Synthetic abstract without an accessed full text",
+      "uri": "https://example.org/synthetic/abstract-only",
+      "existence": "CONFIRMED",
+      "existence_basis": "Synthetic fixture declaration",
+      "access_scope": "abstract",
+      "read_scope": "Abstract only",
+      "accessed_at": "2026-11-24",
+      "read_by": "fixture-only:test-author"
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "C1",
+      "text": "The full text establishes a general philosophical conclusion.",
+      "evidence": [
+        {
+          "source_id": "S1",
+          "status": "VERIFIED",
+          "support": "SUPPORTED",
+          "verification_scope": "full_text",
+          "locator": {"kind": "section", "value": "Abstract"},
+          "excerpt": "The abstract introduces an inquiry but does not establish a general conclusion.",
+          "assessor": "fixture-only:test-author",
+          "assessment_note": "Intentionally invalid: abstract access is claimed as full-text verification."
+        }
+      ]
+    }
+  ]
+}

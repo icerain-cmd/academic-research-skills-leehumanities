@@ -1,0 +1,10 @@
+{
+  "name": "leehumanities-research",
+  "version": "1.0.0",
+  "description": "한국어 인문학 연구: 개념 계보, 원전 인용, 독립된 논증 비판, 저자 문체 보존과 수정 추적. Four explicit Claude subagent roles and local evidence-record checks.",
+  "author": {"name": "Lee Humanities", "url": "https://github.com/icerain-cmd"},
+  "homepage": "https://github.com/icerain-cmd/academic-research-skills-leehumanities",
+  "repository": "https://github.com/icerain-cmd/academic-research-skills-leehumanities",
+  "license": "CC-BY-NC-4.0",
+  "keywords": ["humanities", "korean", "philosophy", "genealogy", "citation", "academic-research"]
+}
