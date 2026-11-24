@@ -22,6 +22,41 @@ REFERENCE_NAMES = {
     "citation-audit", "korean-bibliography", "review-and-revision",
     "abstracts-and-language", "concept-continuity",
 }
+BASE_READ_TOOLS = {"Read", "Glob", "Grep"}
+WEB_READ_TOOLS = BASE_READ_TOOLS | {"WebSearch", "WebFetch"}
+# Exact optional retrieval IDs observed on the target host. This validates the
+# declaration, not server availability or whether a returned source is true.
+# Never replace these sets with MCP wildcards: a server can add mutation tools.
+OPTIONAL_READ_MCP_TOOLS = {
+    "mcp__jj-academic-korea__nlk_lod_search_subject",
+    "mcp__jj-academic-korea__nlk_lod_get_resource",
+    "mcp__jj-academic-korea__riss_generate_search_queries",
+    "mcp__jj-academic-korea__riss_generate_manual_search_url",
+    "mcp__jj-academic-korea__riss_manual_verification_checklist",
+    "mcp__jj-academic-korea__kci_status",
+    "mcp__jj-academic-korea__kci_search_articles",
+    "mcp__jj-academic-korea__kci_search_references",
+    "mcp__semantic-scholar__get_paper",
+    "mcp__semantic-scholar__get_paper_batch",
+    "mcp__semantic-scholar__get_citations",
+    "mcp__semantic-scholar__search_authors_by_name",
+    "mcp__semantic-scholar__get_author_papers",
+    "mcp__semantic-scholar__search_papers_by_relevance",
+    "mcp__semantic-scholar__search_paper_by_title",
+    "mcp__semantic-scholar__snippet_search",
+    "mcp__jj-filesystem__read_text_file",
+    "mcp__jj-filesystem__read_multiple_files",
+    "mcp__jj-filesystem__list_directory",
+    "mcp__jj-filesystem__search_files",
+    "mcp__jj-filesystem__get_file_info",
+    "mcp__jj-filesystem__list_allowed_directories",
+}
+ROLE_ALLOWED_TOOLS = {
+    "lh-theorist": WEB_READ_TOOLS | {"ToolSearch"} | OPTIONAL_READ_MCP_TOOLS,
+    "lh-source-verifier": WEB_READ_TOOLS | {"ToolSearch"} | OPTIONAL_READ_MCP_TOOLS,
+    "lh-argument-critic": WEB_READ_TOOLS,
+    "lh-style-editor": BASE_READ_TOOLS,
+}
 
 
 def read_json(path: Path, errors: list[str]) -> dict:
@@ -136,6 +171,25 @@ def check_markdown_links(root: Path, path: Path, errors: list[str]) -> None:
             errors.append(f"{path.relative_to(root)}: missing plugin-root reference: {raw}")
 
 
+def check_agent_tools(stem: str, agent: dict[str, str], errors: list[str]) -> None:
+    """Keep explicit role boundaries without requiring optional MCP servers."""
+    raw = agent.get("tools", "")
+    if not raw.strip():
+        # Omitting tools would inherit the parent pool, including write tools.
+        errors.append(f"{stem}.md: an explicit nonempty tools allowlist is required")
+        return
+    entries = [entry.strip() for entry in raw.split(",")]
+    if any(not entry for entry in entries) or len(entries) != len(set(entries)):
+        errors.append(f"{stem}.md: tools allowlist has empty or duplicate entries")
+    declared = set(entries)
+    unexpected = declared - ROLE_ALLOWED_TOOLS.get(stem, set())
+    if unexpected:
+        errors.append(f"{stem}.md: tools outside the role's read-only allowlist: {sorted(unexpected)}")
+    missing = BASE_READ_TOOLS - declared
+    if missing:
+        errors.append(f"{stem}.md: missing built-in read tools for the optional-MCP fallback: {sorted(missing)}")
+
+
 def validate_repo(repo: Path) -> dict:
     repo = repo.resolve()
     root = repo / PLUGIN_RELATIVE
@@ -216,6 +270,7 @@ def validate_repo(repo: Path) -> dict:
             errors.append(f"{path.name}: agent name/description mismatch")
         if agent.get("model", "inherit") != "inherit":
             errors.append(f"{path.name}: default agent model must inherit the user's session")
+        check_agent_tools(stem, agent, errors)
     for path in commands.values():
         if not frontmatter(path, errors).get("description"):
             errors.append(f"{path.name}: command description is required")

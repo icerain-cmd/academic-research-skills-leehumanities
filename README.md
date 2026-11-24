@@ -80,6 +80,12 @@ Windows PowerShell에서는 `./tools/leehumanities/install.ps1`, macOS/Linux에�
 
 **기본값은 모든 역할이 현재 Claude 모델을 상속하는 것입니다.** 역할 분리는 여러 회사의 모델을 사용한 교차 검증을 뜻하지 않습니다. 기존 Hermes 봇이나 운영 중인 공용 기억을 자동으로 연결·수정하지 않습니다.
 
+### 선택적인 MCP 문헌 조회
+
+1.0.1부터 이론 구성자와 출처 검증자는 기존에 연결된 `jj-academic-korea`, `semantic-scholar`, `jj-filesystem`의 지정된 검색·조회 도구를 직접 사용할 수 있습니다. `ToolSearch`와 개별 도구 이름을 허용하며, MCP 전체나 파일 쓰기·삭제·실행 도구는 허용하지 않습니다. 이 플러그인은 서버를 설치하거나 키와 접속 정보를 배포하지 않습니다. 해당 서버가 없는 환경에서는 기본 읽기·웹 도구와 부모 세션이 제공한 출처·열람 기록을 사용합니다.
+
+RISS 도구는 검색어·검색 URL·수동 확인 목록을 만드는 보조 기능입니다. 그 응답만으로 RISS를 검색했거나 문헌을 확인했다고 표시하지 않습니다. 서버 연결, 도구 호출 성공, 서지 확인, 원문 열람과 주장 검증은 각각 따로 기록합니다.
+
 ## 자료와 결과의 위치
 
 사용자가 지정한 원문 폴더를 읽고, **원문 폴더 및 설치된 플러그인 밖의 작업 폴더**에 결과를 씁니다. 일반적인 작업 위치는 연구 프로젝트의 `.leehumanities/runs/<run-id>/`입니다. 원문 전체가 같은 프로젝트 루트에 있다면 작업 폴더를 별도의 형제 디렉터리에 두거나 실제 원문 하위 폴더를 지정합니다.
@@ -116,6 +122,8 @@ claude plugin validate .claude-plugin/marketplace.json --strict
 위 검사는 Linux와 Windows에서 실행했습니다. GitHub Actions 자동 검사를 위한 [워크플로 예제](tools/leehumanities/github-actions.example.yml)도 제공하지만, 이 배포에서는 자동 실행을 활성화하지 않았습니다. GitHub 인증에 워크플로 변경 권한이 있는 경우 예제를 `.github/workflows/leehumanities.yml`에 추가할 수 있습니다. 원본의 다른 워크플로는 이 포크의 검증 절차가 아닙니다.
 
 소프트웨어 검사는 모델을 호출하지 않으므로 검사 통과가 인문학적 해석의 정확도나 실제 심사 성능을 입증하지 않습니다. 배포 검증 기록은 [VALIDATION.leehumanities.md](VALIDATION.leehumanities.md)에 구분해 남깁니다.
+
+실제 역할 호출을 시험할 때 사용할 [합성 원고](plugins/leehumanities-research/tests/fixtures/runtime-manuscript.md)와 [합성 자료 A](plugins/leehumanities-research/tests/fixtures/runtime-source-a.md)도 제공합니다. 이 원고에는 원문과 반대인 직접 인용과 과잉 일반화가 의도적으로 들어 있습니다. 해당 파일을 별도 작업 폴더에 복사한 뒤 `review`에 전달하고 실제 배정한 역할과 근거를 확인하세요. 이 시험은 Claude 로그인이 필요하며 사용량이 발생합니다. 한 합성 사례의 성공을 실제 연구 전반의 정확도로 해석하지 않습니다.
 
 ## 배포 범위와 라이선스
 

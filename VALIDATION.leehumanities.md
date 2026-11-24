@@ -1,4 +1,47 @@
-# Lee Humanities 1.0.0 validation record
+# Lee Humanities validation record
+
+## 1.0.1 — 2026-11-24 (Asia/Seoul)
+
+### Package and permission checks
+
+- Linux package/installer suite: 22 tests passed, including seven new tests covering role tool boundaries and optional-MCP fallback.
+- Windows package/installer suite: 22 tests completed, 21 passed and one skipped for unavailable symbolic-link capability.
+- Package conformance: four agents, nine commands, matching `1.0.1` manifest versions, no errors.
+- Native Claude Code `2.1.288` strict plugin and marketplace validation: no errors or warnings.
+- The local corpus/evidence/drift implementation is unchanged from 1.0.0; its earlier 30-test results remain documented below. They were not repeated for this tool-permission update.
+
+### Live role and tool checks
+
+A real Claude Code run loaded the `1.0.1` candidate via `--plugin-dir` and separately dispatched all four namespaced roles with the same synthetic manuscript/source pair. The runtime reported `claude-sonnet-5-5`. Streamed tool events tied the source verifier's MCP calls to its own Agent invocation, rather than to the parent.
+
+- The theorist identified a shift from the provisional definition of mutual revision to agreement and then to all interactions.
+- The argument critic identified the unsupported move from agreeing answers to universal truth, the universalized conclusion and the claim of no errors.
+- The source verifier compared the claimed quotation with section 2 of synthetic source A and identified the reversed negation; it reported the quotation as unsupported. It used native `Read` after the MCP path restriction below.
+- The style editor proposed a sentence preserving the provisional definition.
+- The fixture files' SHA-256 values were unchanged after the run. The live run ended successfully in 113.2 seconds. This is one synthetic diagnostic, not a benchmark of research accuracy or publication readiness.
+
+The two public fixtures are in `plugins/leehumanities-research/tests/fixtures/runtime-manuscript.md` and `runtime-source-a.md`; runtime copies differed only in blank-line layout.
+
+### Service and access findings
+
+- `jj-filesystem` initialization and tool discovery succeeded in approximately 2.45 seconds. Fresh native Claude Code health checks also connected successfully. The earlier reported 30-second connection timeout did not recur; its cause was not established and no timeout/configuration change was made.
+- Reading the synthetic fixture from the system temporary folder through `jj-filesystem` was denied because that folder was outside the server's existing allowed directories. This was a functioning access boundary, not a connection failure. The allowed directories were not broadened.
+- The verifier directly called the RISS manual-search-URL generator successfully. Its result was `NEEDS_MANUAL_CHECK`: no RISS search or bibliography verification occurred.
+- Semantic Scholar's MCP server connected, but the verifier's `get_paper` call and one retry returned `Working outside of request context`. This external tool failure is unresolved; MCP connection success must not be reported as retrieval success.
+- A separate direct request to Semantic Scholar's official Graph REST endpoint returned HTTP 200 with title/year/URL for the public test DOI. This was a distinct metadata-only channel, not a successful MCP call or full-text reading.
+- The inspected `.in_use` marker contained a PID and process-start marker; its PID matched a live Claude process. It was left unchanged. Current plugin documentation describes cache lifecycle, while the exact lease interpretation is corroborated by implementation reports rather than a documented public marker schema.
+
+### Allowed-directory and retrieval positive control
+
+A second bounded run dispatched the source verifier once. It completed in 36.2 seconds, and streamed events attributed all three operations below to that subagent:
+
+- `jj-filesystem.read_text_file` successfully read the first eight lines of an explicitly scoped program-source file inside an already-allowed directory. Together with the denied temporary-folder read above, this confirmed both permitted access and the existing directory boundary.
+- `jj-academic-korea.kci_search_articles` actually searched the public topic `사이버문학`; the response reported 17 total records and returned 10. This was bibliography retrieval, not original-paper verification. Some abstract fields were `[object Object]`; that formatting defect remains in the existing MCP service, and the plugin now explicitly treats such placeholders as unreadable text rather than accessed abstracts.
+- The verifier's `WebFetch` call to Semantic Scholar's official Graph REST URL successfully retrieved the public test paper's title, year and source URL. It preserved the earlier MCP failure and did not claim full-text access.
+
+The direct MCP permission defect is corrected in the candidate. Final published-package installation verification will be recorded after the update.
+
+## 1.0.0 baseline
 
 Date: 2026-11-24 (Asia/Seoul). Upstream baseline: `83c23082f3613b1b105f5a93642efda2cca628b2`.
 

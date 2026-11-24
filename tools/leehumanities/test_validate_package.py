@@ -4,7 +4,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from validate_package import AGENTS, COMMANDS, REFERENCE_NAMES, PLUGIN_RELATIVE, validate_repo
+from validate_package import (
+    AGENTS, BASE_READ_TOOLS, COMMANDS, OPTIONAL_READ_MCP_TOOLS, REFERENCE_NAMES,
+    PLUGIN_RELATIVE, WEB_READ_TOOLS, validate_repo,
+)
 
 
 class PackageValidationTests(unittest.TestCase):
@@ -28,7 +31,7 @@ class PackageValidationTests(unittest.TestCase):
         for stem in REFERENCE_NAMES:
             self.put(f"skills/humanities-research/references/{stem}.md", "# Fixture\n")
         for stem in AGENTS:
-            self.put(f"agents/{stem}.md", f"---\nname: {stem}\ndescription: Example\nmodel: inherit\n---\n")
+            self.agent(stem, BASE_READ_TOOLS if stem == "lh-style-editor" else WEB_READ_TOOLS)
         for stem in COMMANDS:
             self.put(f"commands/{stem}.md", "---\ndescription: Example\n---\nRead ${CLAUDE_PLUGIN_ROOT}/skills/humanities-research/SKILL.md\n")
 
@@ -39,6 +42,10 @@ class PackageValidationTests(unittest.TestCase):
 
     def put(self, path, text):
         self.write(PLUGIN_RELATIVE / path, text)
+
+    def agent(self, stem, tools=None):
+        declaration = "" if tools is None else "tools: " + ", ".join(sorted(tools)) + "\n"
+        self.put(f"agents/{stem}.md", f"---\nname: {stem}\ndescription: Example\n{declaration}model: inherit\n---\n")
 
     def test_self_contained_package_is_valid(self):
         result = validate_repo(self.repo)
@@ -66,6 +73,60 @@ class PackageValidationTests(unittest.TestCase):
     def test_missing_real_agent_is_rejected(self):
         (self.plugin / "agents/lh-source-verifier.md").unlink()
         self.assertFalse(validate_repo(self.repo)["ok"])
+
+    def test_optional_retrieval_tools_are_valid_without_mcp_configuration(self):
+        for stem in ("lh-source-verifier", "lh-theorist"):
+            self.agent(stem, WEB_READ_TOOLS | {"ToolSearch"} | OPTIONAL_READ_MCP_TOOLS)
+        self.assertFalse((self.plugin / ".mcp.json").exists())
+        result = validate_repo(self.repo)
+        self.assertTrue(result["ok"], result["errors"])
+
+    def test_builtin_fallback_is_valid_without_optional_lookup_tools(self):
+        for stem in ("lh-source-verifier", "lh-theorist"):
+            self.agent(stem, WEB_READ_TOOLS)
+        result = validate_repo(self.repo)
+        self.assertTrue(result["ok"], result["errors"])
+
+    def test_mcp_wildcards_are_rejected(self):
+        for tool in ("*", "mcp__*", "mcp__jj-academic-korea__*", "mcp__jj-filesystem__*"):
+            with self.subTest(tool=tool):
+                self.agent("lh-source-verifier", WEB_READ_TOOLS | {tool})
+                errors = validate_repo(self.repo)["errors"]
+                self.assertTrue(any("read-only allowlist" in error and tool in error for error in errors), errors)
+
+    def test_write_exec_and_unapproved_mcp_tools_are_rejected(self):
+        # MCP mutation names are negative fixtures, not claims about a server's inventory.
+        prohibited = {"Write", "Edit", "Bash", "PowerShell", "NotebookEdit", "Agent",
+                      "mcp__jj-filesystem__write_file", "mcp__jj-filesystem__delete_file",
+                      "mcp__asr__save_record"}
+        for stem in AGENTS:
+            for tool in prohibited:
+                with self.subTest(agent=stem, tool=tool):
+                    self.agent(stem, BASE_READ_TOOLS | {tool})
+                    errors = validate_repo(self.repo)["errors"]
+                    self.assertTrue(any(stem in error and "read-only allowlist" in error and tool in error for error in errors), errors)
+            self.agent(stem, BASE_READ_TOOLS)
+
+    def test_optional_lookup_tools_are_not_granted_to_other_roles(self):
+        for stem in ("lh-argument-critic", "lh-style-editor"):
+            for tool in ("ToolSearch", "mcp__semantic-scholar__get_paper"):
+                with self.subTest(agent=stem, tool=tool):
+                    self.agent(stem, BASE_READ_TOOLS | {tool})
+                    errors = validate_repo(self.repo)["errors"]
+                    self.assertTrue(any(stem in error and "read-only allowlist" in error for error in errors), errors)
+            self.agent(stem, BASE_READ_TOOLS)
+
+    def test_implicit_tool_inheritance_is_rejected(self):
+        for tools in (None, set()):
+            with self.subTest(tools=tools):
+                self.agent("lh-source-verifier", tools)
+                errors = validate_repo(self.repo)["errors"]
+                self.assertTrue(any("explicit nonempty tools allowlist" in error for error in errors), errors)
+
+    def test_mcp_only_role_is_rejected_without_builtin_fallback(self):
+        self.agent("lh-source-verifier", {"ToolSearch", "mcp__semantic-scholar__get_paper"})
+        errors = validate_repo(self.repo)["errors"]
+        self.assertTrue(any("missing built-in read tools" in error for error in errors), errors)
 
     def test_version_mismatch_is_rejected(self):
         path = self.plugin / ".claude-plugin/plugin.json"

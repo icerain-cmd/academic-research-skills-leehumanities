@@ -1,5 +1,12 @@
 # Lee Humanities changes
 
+## 1.0.1 — 2026-11-24
+
+- Allowed the theorist and source verifier to discover and call explicitly listed read-only scholarly/file MCP tools from already-configured servers; retained narrower critic/style roles and a parent-provided-source fallback.
+- Added package checks against write/execute tools, unknown MCP tool IDs and broad MCP wildcards in the role definitions.
+- Made doctor distinguish configuration, connection, tool permissions, actual tool calls and source verification. Clarified that RISS query helpers do not perform a RISS search, and that a filesystem MCP failure does not establish failure of native file reads.
+- Kept runtime `.in_use` bookkeeping separate from plugin-owned output and diagnoses.
+
 ## 1.0.0 — 2026-11-24
 
 - Added a self-contained Claude Code plugin under `plugins/leehumanities-research` and a dedicated `leehumanities` marketplace.

@@ -9,7 +9,7 @@
     {
       "name": "leehumanities-research",
       "source": "./plugins/leehumanities-research",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "인문학 연구·집필·검증 플러그인. 4개 명시적 역할, 9개 명령, 로컬 출처 기록 및 수정 비교.",
       "license": "CC-BY-NC-4.0"
     }
